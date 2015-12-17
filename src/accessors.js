@@ -126,6 +126,18 @@ function accessor_build(obj, p) {
 		return obj;
 	};
 
+	obj.hash = function(value) {
+		if (!arguments.length) return p.hash;
+
+		value = accessorifyNumeric(value);
+
+    if(p.min) console.warn('MIN aggregation is being overwritten by HASH accessor');
+    if(p.max) console.warn('MAX aggregation is being overwritten by HASH accessor');
+
+		p.hash = value;
+		return obj;
+	};
+
 	obj.exceptionCount = function(value) {
 		if (!arguments.length) return p.exceptionCount;
 
