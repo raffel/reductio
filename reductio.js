@@ -13208,11 +13208,15 @@ var reductio_hash = {
         delete path(p).hash[a(v)];
         if (a(v) == path(p).max) {
           // max value was removed, need to recalculate max
-          path(p).max = _.max(_.keys(path(p).hash));
+          path(p).max = _.max(_.map(_.keys(path(p).hash), function(v) {
+            return +v;
+          }));
         }
         if (a(v) == path(p).min) {
           // min value was removed, need to recalculate min
-          path(p).min = _.min(_.keys(path(p).hash));
+          path(p).min = _.min(_.map(_.keys(path(p).hash), function(v) {
+            return +v;
+          }));
         }
       }
       else {
@@ -13641,18 +13645,30 @@ var reductio_sum_of_sq = {
 
 module.exports = reductio_sum_of_sq;
 },{}],26:[function(require,module,exports){
+var _ = require('lodash');
+
 var reductio_sum = {
 	add: function (a, prior, path) {
 		return function (p, v, nf) {
 			if(prior) prior(p, v, nf);
-			path(p).sum = path(p).sum + a(v);
+      if (!_.isNumber(a(v))) {
+        path(p).countNaN++;
+      } else {
+			  path(p).sumNaN = path(p).sumNaN + a(v);
+      }
+      path(p).sum = (path(p).countNaN > 0) ? undefined : path(p).sumNaN;
 			return p;
 		};
 	},
 	remove: function (a, prior, path) {
 		return function (p, v, nf) {
 			if(prior) prior(p, v, nf);
-			path(p).sum = path(p).sum - a(v);
+      if (!_.isNumber(a(v))) {
+        path(p).countNaN--;
+      } else {
+			  path(p).sumNaN = path(p).sumNaN - a(v);
+      }
+      path(p).sum = (path(p).countNaN > 0) ? undefined : path(p).sumNaN;
 			return p;
 		};
 	},
@@ -13660,13 +13676,16 @@ var reductio_sum = {
 		return function (p) {
 			p = prior(p);
 			path(p).sum = 0;
+			path(p).sumNaN = 0;
+      path(p).countNaN = 0;
 			return p;
 		};
 	}
 };
 
 module.exports = reductio_sum;
-},{}],27:[function(require,module,exports){
+
+},{"lodash":2}],27:[function(require,module,exports){
 (function (global){
 var crossfilter = (typeof window !== "undefined" ? window['crossfilter'] : typeof global !== "undefined" ? global['crossfilter'] : null);
 

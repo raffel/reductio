@@ -37,11 +37,15 @@ var reductio_hash = {
         delete path(p).hash[a(v)];
         if (a(v) == path(p).max) {
           // max value was removed, need to recalculate max
-          path(p).max = _.max(_.keys(path(p).hash));
+          path(p).max = _.max(_.map(_.keys(path(p).hash), function(v) {
+            return +v;
+          }));
         }
         if (a(v) == path(p).min) {
           // min value was removed, need to recalculate min
-          path(p).min = _.min(_.keys(path(p).hash));
+          path(p).min = _.min(_.map(_.keys(path(p).hash), function(v) {
+            return +v;
+          }));
         }
       }
       else {
